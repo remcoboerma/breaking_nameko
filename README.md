@@ -6,6 +6,19 @@ the application hits a point where eventlet has monkey-patched the standard libr
 greenthread-switch is performed, while waiting for IO.
 
 I'n this example i'm booting 2 clients who query the same nameko http service.
+1 client is requesting /simple that's, well, fairly simple. Returning just a string.
+
+The other client requests only `/sleep/5`, which will `eventlet.sleep(5)`. Since this is
+greenlets, you'd image a couple of sleeping threads won't bother, because that's what
+greenlets are all about. Right?
+
+Given the nameko output you'll notice the first batch of requests is as excepted.  
+Only /simple is requested, and it's quite fast. but as soon as `/sleep/5` kicks in, everything  
+is going really slow. Even the simple requests.
+
+If you have any clue, please help me solve this because i'm having trouble using Nameko this way
+and i've built quite a stack depending on nameko already.
+
 
 ## Sample output
 ```log
