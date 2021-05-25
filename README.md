@@ -1,3 +1,7 @@
+# Solved.
+
+This issue is solved. See [Sollution](#sollution)
+
 # Wat's bugging me
 
 Nameko uses greenlets, implicating `implicit cooperative` green threads.  
@@ -113,4 +117,34 @@ starting services: Service
 127.0.0.1 - - [22/May/2021 17:21:39] "GET /sleep/5 HTTP/1.1" 200 145 14.015985
 127.0.0.1 - - [22/May/2021 17:21:43] "GET /sleep/5 HTTP/1.1" 200 145 18.787904
 127.0.0.1 - - [22/May/2021 17:21:43] "GET /sleep/5 HTTP/1.1" 200 145 18.787904
+```
+
+## Sollution:
+
+fix: Thanks to [Max Bennet's remark](https://discourse.nameko.io/t/concurrent-webrequests-seem-threaded-instead-of-greenthreaded/694/4?u=remcoboerma),
+it's just a simple as adding `max_workers=1000` to a `config.yaml` file.
+
+> Have also spotted the problem: you haven’t changed default max_workers, which is set to a silly-low value of 10.  
+> Since you’re always running more than 10 concurrent “sleepy” requests, everything has to wait behind them.  
+> To remedy, add a config file with:  
+>  `max_workers = 1000`  
+> Or if you’re using Nameko 3, you can set it on the command line:  
+>  `nameko run ... --define max-workers=1000`
+
+
+
+Issue solved!
+```log
+    127.0.0.1 - - [25/May/2021 16:11:58] "GET /simple HTTP/1.1" 200 158 0.000341
+    127.0.0.1 - - [25/May/2021 16:11:58] "GET /simple HTTP/1.1" 200 158 0.000319
+    127.0.0.1 - - [25/May/2021 16:11:58] "GET /sleep/10 HTTP/1.1" 200 145 10.000909
+    127.0.0.1 - - [25/May/2021 16:11:58] "GET /simple HTTP/1.1" 200 158 0.000414
+    127.0.0.1 - - [25/May/2021 16:11:58] "GET /sleep/10 HTTP/1.1" 200 145 10.000926
+    127.0.0.1 - - [25/May/2021 16:11:58] "GET /simple HTTP/1.1" 200 158 0.000340
+    127.0.0.1 - - [25/May/2021 16:11:58] "GET /sleep/10 HTTP/1.1" 200 145 10.001309
+    127.0.0.1 - - [25/May/2021 16:11:58] "GET /sleep/10 HTTP/1.1" 200 145 10.001001
+    127.0.0.1 - - [25/May/2021 16:11:58] "GET /sleep/10 HTTP/1.1" 200 145 10.000639
+    127.0.0.1 - - [25/May/2021 16:11:58] "GET /simple HTTP/1.1" 200 158 0.000399
+    127.0.0.1 - - [25/May/2021 16:11:58] "GET /simple HTTP/1.1" 200 158 0.000359
+    127.0.0.1 - - [25/May/2021 16:11:58] "GET /simple HTTP/1.1" 200 158 0.000333
 ```
