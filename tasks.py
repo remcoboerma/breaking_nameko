@@ -11,7 +11,7 @@ import time
 @task()
 def run(ctx, web=True):
     # nameko service to run
-    nameko_service = nameko["run", "services:Service"]
+    nameko_service = nameko["run", "--config", "./config.yaml", "services:Service"]
     # locust test runner for simple request. should work near instantly
     locust_simple = locust[
         "--tags", "simple", "--host", "http://localhost:8000", "-P", 8081
@@ -47,7 +47,7 @@ def run(ctx, web=True):
         with nameko_service.bgrun(
             stdout=sys.stdout, stderr=sys.stderr
         ) as nameko_instance:
-            time.sleep(2)
+            time.sleep(1)
             with locust_simple.bgrun() as simple_job:
                 time.sleep(5)
                 locust_sleepy & BG
@@ -64,7 +64,7 @@ def run(ctx, web=True):
         ) as nameko_instance:
             time.sleep(1)
             with locust_simple.bgrun(stdout=sys.stdout) as simple_job:
-                time.sleep(5)
+                time.sleep(1)
                 locust_sleepy & BG(stdout=sys.stdout)
-            time.sleep(1)
+            time.sleep(5)
             nameko_instance.terminate()

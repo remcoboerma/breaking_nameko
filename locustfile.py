@@ -15,7 +15,7 @@ class SamenhangendeComponentenTest(HttpUser):
     @task(1)
     def met_sleep(self):
         # _from = 1 if random.randint(1, 100) < 60 else random.randint(1, 80)
-        self.client.get("/sleep/5")
+        self.client.get("/sleep/10")
 
     # @tag("simple_request")
     # @task()
